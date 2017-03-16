@@ -1,0 +1,140 @@
+---
+title: "Introduction to the rif package"
+author: "Scott Chamberlain"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: readable
+vignette: >
+  %\VignetteIndexEntry{Introduction to the rif package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r echo=FALSE}
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+`rif` is an R wrapper for the [Neuroscience Information Framework (NIF)](https://www.neuinfo.org/)  APIs.
+
+* API docs at [http://nif-services.neuinfo.org/servicesv1/](http://nif-services.neuinfo.org/servicesv1/)
+* Various clients at [http://nif-services.neuinfo.org/servicesv1/downloads.html](http://nif-services.neuinfo.org/servicesv1/downloads.html)
+
+## Install
+
+Stable `rif` version from CRAN
+
+```{r eval=FALSE}
+install.packages("rif")
+```
+
+Or, the development version from Github
+
+```{r eval=FALSE}
+devtools::install_github("ropensci/rif")
+```
+
+```{r}
+library("rif")
+```
+
+## Summary
+
+```{r}
+out <- rif_summary("cellular")
+head(out$result$federationSummary$results)
+```
+
+## Query
+
+List NIF query categories
+
+```{r}
+rif_query_categories()
+```
+
+## Vocabulary
+
+Search for vocabulary terms
+
+```{r}
+vocabulary_search("cell", limit = 3)
+```
+
+## Lexical
+
+Break up text into various things
+
+```{r}
+text <- "Lorem ipsum inceptos dolor nisi torquent porttitor donec, blandit scelerisque
+mattis cras quis mi, aliquam sagittis. Convallis placerat commodo imperdiet varius nunc
+tempus urna vitae ultrices tristique eu mi ornare velit donec, posuere laoreet pretium
+vitae porta augue porta feugiat in sapien egestas. Quam odio nullam pulvinar litora
+curabitur amet lacus sociosqu gravida ligula molestie dui netus fusce bibendum
+scelerisque, dictum malesuada proin elit etiam aliquam, mattis euismod donec nisl facilisis."
+text <- gsub("\n", "", text)
+```
+
+### Sentences
+
+```{r}
+lexical_sentences(text)
+```
+
+### Chunks
+
+```{r}
+head(lexical_chunks(text))
+```
+
+### Entities
+
+```{r}
+head(lexical_entities(text))
+```
+
+## Literature
+
+Search
+
+```{r}
+literature_search(query = "cellular", count = 5)
+```
+
+Get retractions
+
+```{r}
+out <- literature_retractions()
+out[1:20]
+```
+
+Then get info on some articles
+
+```{r}
+arts <- literature_pmid(pmid = out[1:2])
+lapply(arts, "[[", "title")
+```
+
+## Data
+
+Search for data
+
+```{r}
+out <- federation_search("cellular")
+out$query
+head(out$result$results)
+```
+
+Get some data
+
+```{r}
+out <- federation_data(id = "nlx_152871-2")
+out$result$result
+```
